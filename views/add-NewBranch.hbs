@@ -1,0 +1,436 @@
+<div class="modal fade" id="countryModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add New Country</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input id="CountryName" value="" type="text" class="form-control" placeholder="Country Name"
+                    name="CountryName">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="submitAdd" type="submit" onclick="" class="btn btn-primary">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="regionModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabelRegion">Add New Region</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input id="RegionName" value="" type="text" class="form-control" placeholder="Region Name"
+                    name="RegionName">
+            </div>
+            <div id="CityBlock" style="display: none;" class="modal-body">
+                <input id="CityName" value="" type="text" class="form-control" placeholder="City Name" name="CityName">
+            </div>
+            <div id="selectCityBlock" class="modal-body">
+                <select id="selectCity" class="form-select" aria-label="Default select example" name="CityId">
+                    <option value="" disabled selected>Select City</option>
+                </select>
+            </div>
+            <div id="switchCityBlocks" class="modal-body">
+                <button style="width: 100%;" onclick="fcnSwitchCityBlocks()" id="switchCityButton" type="button"
+                    class="btn btn-light">Add City <i class="bi bi-toggle-off"></i></button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="RegionSubmitAdd" type="submit" onclick="" class="btn btn-primary">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="margin-bottom: 2vh;" class="row">
+    <div class="col-6">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/api/markets">Supermarkets</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Add Supermarket</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="col-6 d-flex justify-content-end">
+        <a onclick="getAddReady()" type="button" class="btn btn-primary align-self-center">+ Add Country</a>
+        <a style="margin-left: 1vw;" onclick="getRegionAddReady()" type="button"
+            class="btn btn-secondary align-self-center">+ Add Region</a>
+    </div>
+</div>
+
+<div id="alert">
+
+</div>
+
+
+<form id="form" class="row g-3 needs-validation" action="/api/markets/addBranch" novalidate>
+    <h7>Choose Supermarket:</h7>
+    <div class="col-6">
+        <select id="selectSupermarket" class="form-select" aria-label="Default select example" name="SupermarketId">
+            <option value="" disabled selected>Select Supermarket</option>
+            {{#each rows.[1]}}
+            <option value="{{this.SupermarketId}}">{{this.SupermarketName}}, {{this.Description}}</option>
+            {{/each}}
+        </select>
+    </div>
+
+    <h7>Supermarket Address:</h7>
+    <div class="col-6">
+        <select id="selectCountry" class="form-select" aria-label="Default select example" name="CountryId">
+            <option value="" disabled selected>Select Country</option>
+            {{#each rows.[0]}}
+            <option value="{{this.CountryId}}">{{this.CountryName}}</option>
+            {{/each}}
+        </select>
+    </div>
+
+
+    <div class="col-6">
+        <select id="selectRegion" class="form-select" aria-label="Default select example" name="RegionId">
+            <option value="" disabled selected>Select Region</option>
+        </select>
+    </div>
+
+    <div class="col-6">
+        <div class="form-floating mb-3">
+            <input value="{{this.productName}}" type="text" class="form-control" id="floatingInput" placeholder="Street"
+                name="Street">
+            <label for="floatingInput">Street</label>
+        </div>
+    </div>
+
+    <div class="col-6">
+        <div class="form-floating mb-3">
+            <textarea class="form-control" name="AddressDescription" id="floatingInput" cols="55" rows="55"
+                placeholder="Description">{{this.Description}}</textarea>
+            <label for="floatingInput"> Address Description</label>
+        </div>
+    </div>
+
+    <div class="col-12 d-flex justify-content-end">
+        <button class="btn btn-primary" type="submit" style="width:12vw;">Submit</button>
+    </div>
+</form>
+
+
+<script>
+    const form = document.querySelector('#form');
+    form.addEventListener('submit', (event) => {
+
+        // disable default action
+        event.preventDefault();
+        let url = document.getElementById('form').action;
+
+        // prepare form data
+        let data = new FormData(form);
+
+        // configure a request
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', url, true);
+
+        //alert("sd")
+        let obj = {
+            RegionId: data.get('RegionId'),
+            Street: data.get('Street'),
+            AddressDescription: data.get('AddressDescription'),
+            SupermarketId: data.get('SupermarketId')
+        }
+
+        // set headers
+        xhr.setRequestHeader("Content-Type", "application/json");
+        //xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+        // send request
+        xhr.send(JSON.stringify(obj));
+
+        // listen for `load` event
+        xhr.onload = function () {
+            if (this.status === 200) {
+                //obj = JSON.parse(this.responseText);
+                obj = JSON.parse(this.responseText);
+                document.getElementById('alert').innerHTML = `
+                <div style="text-align: center;" class="alert alert-success alert-dismissible fade show" role="alert">
+                ${obj.alert}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+            } else {
+                obj = JSON.parse(this.responseText);
+                document.getElementById('alert').innerHTML = `
+                <div style="text-align: center;" class="alert alert-warning alert-dismissible fade show" role="alert">
+                ${obj.fail}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+            }
+
+        }
+
+    });
+
+
+    document.getElementById("selectCountry").addEventListener("change", addActivityItem, true);
+
+    function addActivityItem() {
+        let cid = document.getElementById("selectCountry").value;
+
+        // Instantiate new XHR Object
+        const xhr = new XMLHttpRequest();
+
+        // Open an object (GET/POST, PATH,
+        // ASYN-TRUE/FALSE)
+        xhr.open("GET", "/api/markets/regions/" + cid, true);
+        //alert("s")
+
+        // When response is ready
+        xhr.onload = function () {
+            if (this.status === 200) {
+                // Changing string data into JSON Object
+                obj = JSON.parse(this.responseText);
+                document.getElementById('alert').innerHTML = `
+        <div style="text-align: center;" class="alert alert-success alert-dismissible fade show" role="alert">
+          ${obj.alert}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`;
+
+                $('#selectRegion')
+                    .find('option')
+                    .remove()
+                    .end()
+                    .append('<option value="" disabled selected>Select Region</option>')
+
+                $('#selectCity')
+                    .find('option')
+                    .remove()
+                    .end()
+                    .append('<option value="" disabled selected>Select City</option>')
+
+                $.each(obj.rows[0], function (i, item) {
+                    $('#selectRegion').append($('<option>', {
+                        value: item.RegionId,
+                        text: "" + item.CityName + ", " + item.RegionName
+                    }));
+
+                });
+
+                $.each(obj.rows[1], function (i, item) {
+                    $('#selectCity').append($('<option>', {
+                        value: item.CityId,
+                        text: "" + item.CityName
+                    }));
+
+                });
+
+            }
+            else {
+                obj = JSON.parse(this.responseText);
+                //alert(obj.alert)
+                document.getElementById('alert').innerHTML = `
+        <div style="text-align: center;" class="alert alert-warning alert-dismissible fade show" role="alert">
+          ${obj.fail}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`
+
+                $('#selectRegion')
+                    .find('option')
+                    .remove()
+                    .end()
+                    .append('<option value="" disabled selected>Select Region</option>')
+
+                $('#selectCity')
+                    .find('option')
+                    .remove()
+                    .end()
+                    .append('<option value="" disabled selected>Select City</option>')
+            }
+        }
+        xhr.send();
+
+    }
+
+    function fcnSubmitAdd() {
+        $('#countryModal').modal('hide');
+
+        let CountryName = document.getElementById('CountryName').value;
+        document.getElementById('CountryName').value = "";
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', "/api/markets/addCountry", true);
+
+        let obj = {
+            CountryName
+        }
+        // set headers
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        // send request
+        xhr.send(JSON.stringify(obj));
+
+        // listen for `load` event
+        xhr.onload = function () {
+            if (this.status === 200) {
+                obj = JSON.parse(this.responseText);
+                if (obj.rows) {
+                    $.each(obj.rows, function (i, item) {
+                        $('#selectCountry').append($('<option>', {
+                            value: item.CountryId,
+                            text: "" + item.CountryName
+                        }));
+                    });
+                }
+                // Changing string data into JSON Object
+                document.getElementById('alert').innerHTML = `
+        <div style="text-align: center;" class="alert alert-success alert-dismissible fade show" role="alert">
+          ${obj.alert}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`;
+
+            } else {
+                obj = JSON.parse(this.responseText);
+                document.getElementById('alert').innerHTML = `
+                <div style="text-align: center;" class="alert alert-warning alert-dismissible fade show" role="alert">
+                ${obj.fail}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+            }
+        }
+    }
+
+    function fcnRegionSubmitAdd(CountryId) {
+        $('#regionModal').modal('hide');
+
+        let selectedCity = document.getElementById('selectCity');
+
+        let RegionName = document.getElementById('RegionName').value;
+        document.getElementById('RegionName').value = "";
+
+        let CityName = document.getElementById('CityName').value;
+        document.getElementById('CityName').value = "";
+
+        let selectCity = selectedCity.options[selectedCity.selectedIndex].value.trim();
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', "/api/markets/addRegion/" + CountryId, true);
+
+        let obj = {
+            RegionName,
+            CityName,
+            selectCity
+        }
+        // set headers
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        // send request
+        xhr.send(JSON.stringify(obj));
+
+        // listen for `load` event
+        xhr.onload = function () {
+            if (this.status === 200) {
+                // Changing string data into JSON Object
+                obj = JSON.parse(this.responseText);
+                document.getElementById('alert').innerHTML = `
+        <div style="text-align: center;" class="alert alert-success alert-dismissible fade show" role="alert">
+          ${obj.alert}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`;
+
+                $('#selectRegion')
+                    .find('option')
+                    .remove()
+                    .end()
+                    .append('<option value="" disabled selected>Select Region</option>')
+
+                $('#selectCity')
+                    .find('option')
+                    .remove()
+                    .end()
+                    .append('<option value="" disabled selected>Select City</option>')
+
+                $.each(obj.rows[1], function (i, item) {
+                    $('#selectRegion').append($('<option>', {
+                        value: item.RegionId,
+                        text: "" + item.CityName + ", " + item.RegionName
+                    }));
+
+                });
+
+                $.each(obj.rows[2], function (i, item) {
+                    $('#selectCity').append($('<option>', {
+                        value: item.CityId,
+                        text: "" + item.CityName
+                    }));
+
+                });
+
+            }
+            else {
+                obj = JSON.parse(this.responseText);
+                //alert(obj.alert)
+                document.getElementById('alert').innerHTML = `
+        <div style="text-align: center;" class="alert alert-warning alert-dismissible fade show" role="alert">
+          ${obj.fail}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`
+            }
+        }
+    }
+
+
+    function getAddReady() {
+        $('#countryModal').modal('show');
+        document.getElementById('submitAdd').setAttribute('onclick', 'fcnSubmitAdd()');
+    }
+
+    function getRegionAddReady() {
+        var selectCountry = document.getElementById("selectCountry");
+        let CountryId = selectCountry.value;
+        var CountryName = selectCountry.options[selectCountry.selectedIndex].text;
+
+        if (CountryName == "Select Country") {
+            document.getElementById('alert').innerHTML = `
+                <div style="text-align: center;" class="alert alert-warning alert-dismissible fade show" role="alert">
+                Please select country to add region.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`
+
+        } else {
+            let regionLabel = document.getElementById("exampleModalLabelRegion");
+            regionLabel.innerHTML = "Add new region for country (" + CountryName + ")";
+            $('#regionModal').modal('show');
+            document.getElementById('RegionSubmitAdd').setAttribute('onclick', 'fcnRegionSubmitAdd(' + CountryId + ')');
+        }
+        if ($('#selectCity option').length == 1) {
+            document.getElementById('selectCityBlock').style.display = "none";
+            document.getElementById('CityBlock').style.display = "block";
+            document.getElementById('switchCityBlocks').style.display = "none";
+        } else {
+            document.getElementById('selectCityBlock').style.display = "block";
+            document.getElementById('CityBlock').style.display = "none";
+            document.getElementById('switchCityBlocks').style.display = "block";
+        }
+    }
+
+    function fcnSwitchCityBlocks() {
+        let CityBlock = document.getElementById("CityBlock");
+        let selectCityBlock = document.getElementById('selectCityBlock');
+        let switchCityButton = document.getElementById('switchCityButton');
+        let CityName = document.getElementById('CityName');
+        if (CityBlock.style.display == "none") {
+            selectCityBlock.style.display = "none";
+            CityBlock.style.display = "block";
+            selectCityBlock.getElementsByTagName('option')[0].selected = 'selected'
+            switchCityButton.innerHTML = "Add City <i class='bi bi-toggle-on'></i>";
+        } else {
+            selectCityBlock.style.display = "block";
+            CityBlock.style.display = "none";
+            switchCityButton.innerHTML = "Add City <i class='bi bi-toggle-off'></i>";
+            CityName.value = "";
+        }
+
+    }
+
+</script>

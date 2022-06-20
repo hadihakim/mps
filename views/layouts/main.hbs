@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!--Finished-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Market pricing system</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+
+    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css">-->
+    <link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap5.min.js"></script>
+    <script type="text/javascript"
+        src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.3/handlebars.min.js"></script> <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.3/handlebars.min.js"></script>-->
+
+
+    <style>
+        #leftMenu {
+            transition: all 0.2s;
+            margin-left: 5.1vw;
+        }
+
+        #leftMenu.leftMenu {
+            margin-left: 18vw;
+        }
+
+        /* #content {
+            width: 100%;
+        }*/
+
+        /*.wrapper {
+            display: flex;
+            width: 100%;
+
+        }*/
+
+        #sidebar {
+            max-width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 999;
+            background: #7386D5;
+            color: #fff;
+            transition: all 0.2s;
+        }
+
+
+        /* Shrinking the sidebar from 250px to 80px and center aligining its content*/
+        #sidebar.active {
+            max-width: 80px;
+            text-align: center;
+        }
+
+        a[data-toggle="collapse"] {
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .dropdown-toggle::after {
+            display: block;
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            transition: all 0.2s;
+        }
+
+
+        #dismiss {
+            width: 35px;
+            height: 35px;
+            position: absolute;
+            margin-top: 1.5vh;
+            top: 0;
+            right: 0;
+
+        }
+
+        /*@media (max-width: 768px) {
+            #sidebar {
+                margin-left: -250px;
+            }
+
+            #sidebar.active {
+                margin-left: 0;
+            }
+        }*/
+
+        /*@import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";*/
+
+        /*.linkSidebar,
+        .linkSidebar:hover,
+        .linkSidebar:focus {
+            color: inherit;
+            text-decoration: none;
+            transition: all 0.3s;
+        }*/
+
+        #sidebar .sidebar-header {
+            padding: 20px;
+            background: #6d7fcc;
+
+        }
+
+        #sidebar ul.components {
+            padding: 20px 0;
+            border-bottom: 1px solid #47748b;
+        }
+
+        #sidebar ul p {
+            color: #fff;
+            padding: 10px;
+        }
+
+        #sidebar ul li a {
+            padding: 15px;
+            font-size: 1.1em;
+            color: white;
+            text-decoration: none;
+            display: block;
+        }
+
+
+        #sidebar ul li a:hover {
+            color: #7386D5;
+            background: #fff;
+        }
+
+        #sidebar ul li.active>a,
+        a[aria-expanded="true"] {
+            color: #fff;
+            background: #6d7fcc;
+        }
+
+        /*ul ul a {
+            font-size: 0.9em !important;
+            padding-left: 30px !important;
+            background: #6d7fcc;
+        }*/
+
+
+
+        /* Toggling the sidebar header content, hide the big heading [h3] and showing the small heading [strong] and vice versa*/
+
+        #sidebar.active .sidebar-header h3 {
+            display: none;
+        }
+
+        #sidebar.active .big {
+            display: none;
+        }
+
+        #sidebar .small {
+            display: none;
+        }
+
+        #sidebar.active .small {
+            display: inline-block;
+        }
+
+
+
+
+        #sidebar.active #dismiss {
+            display: none;
+        }
+
+        #sidebar .sidebar-header strong {
+            display: none;
+        }
+
+        #sidebar.active .sidebar-header strong {
+            display: block;
+        }
+
+        #sidebar ul li a {
+            text-align: left;
+        }
+
+        #sidebar.active ul li a {
+            padding: 20px 10px;
+            text-align: center;
+            font-size: 0.85em;
+        }
+
+        /*#sidebar.active ul li a i {
+            margin-right: 0;
+            display: block;
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }*/
+
+        /* Same dropdown links padding*/
+        #sidebar.active ul ul a {
+            padding: 10px !important;
+        }
+
+        /* Changing the arrow position to bottom center position, 
+   translateX(50%) works with right: 50% 
+   to accurately  center the arrow */
+        #sidebar.active .dropdown-toggle::after {
+            top: auto;
+            bottom: 10px;
+            right: 50%;
+            -webkit-transform: translateX(50%);
+            -ms-transform: translateX(50%);
+            transform: translateX(50%);
+        }
+
+
+        @media (max-width: 768px) {
+
+            /* 80px and its content aligned to centre. Pushing it off the screen with the
+       negative left margin
+    */
+            #sidebar.active {
+                min-width: 80px;
+                max-width: 80px;
+                text-align: center;
+                margin-left: -80px !important;
+            }
+
+
+            /* Reappearing the sidebar on toggle button click */
+            #sidebar {
+                margin-left: 0;
+            }
+
+
+            /* Toggling the sidebar header content, 
+       hide the big heading [h3] and showing the small heading [strong] and vice versa
+    */
+            #sidebar .sidebar-header strong {
+                display: none;
+            }
+
+            #sidebar.active .sidebar-header h3 {
+                display: none;
+            }
+
+            #sidebar.active .sidebar-header strong {
+                display: block;
+            }
+
+            /* Downsize the navigation links font size */
+            #sidebar.active ul li a {
+                padding: 20px 10px;
+                font-size: 0.85em;
+            }
+
+            #sidebar.active ul li a i {
+                margin-right: 0;
+                display: block;
+                font-size: 1.8em;
+                margin-bottom: 5px;
+            }
+
+            /* Adjust the dropdown links padding*/
+            #sidebar.active ul ul a {
+                padding: 10px !important;
+            }
+
+            /* Changing the arrow position to bottom center position, 
+      translateX(50%) works with right: 50% 
+      to accurately  center the arrow */
+            .dropdown-toggle::after {
+                top: auto;
+                bottom: 10px;
+                right: 50%;
+                -webkit-transform: translateX(50%);
+                -ms-transform: translateX(50%);
+                transform: translateX(50%);
+            }
+        }
+
+        /*LOADER*/
+        .loader {
+            border: 7px solid #f3f3f3;
+            border-radius: 50%;
+            align-items: center;
+            border-top: 7px solid #3498db;
+            margin-bottom: 2vh;
+            width: 50px;
+            height: 50px;
+            -webkit-animation: spin 2s linear infinite;
+            /* Safari */
+            animation: spin 2s linear infinite;
+        }
+
+        /* Safari */
+        @-webkit-keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /*Login page styling*/
+        .underlineHover:after {
+            display: flex;
+
+            width: 0;
+            height: 2px;
+            background-color: #56baed;
+            content: "";
+            transition: width 0.2s;
+        }
+
+        .underlineHover:hover {
+            color: #0d0d0d;
+        }
+
+        .underlineHover:hover:after {
+            width: 100%;
+        }
+
+        #formFooter {
+            background-color: #f6f6f6;
+            border-top: 1px solid #dce8f1;
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            -webkit-border-radius: 0 0 10px 10px;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .loginWrapper {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            justify-content: center;
+            width: 50%;
+            height: 90%;
+            z-index: 99999;
+            -webkit-border-radius: 10px 10px 10px 10px;
+            border-radius: 10px 10px 10px 10px;
+            background: #fff;
+            -webkit-box-shadow: 0 30px 60px 0 rgba(0, 0, 0, 0.3);
+            box-shadow: 0 30px 60px 0 rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        /* Simple CSS3 Fade-in-down Animation */
+        .fadeInDown {
+            -webkit-animation-name: fadeInDown;
+            animation-name: fadeInDown;
+            -webkit-animation-duration: 1s;
+            animation-duration: 1s;
+            -webkit-animation-fill-mode: both;
+            animation-fill-mode: both;
+        }
+
+        @-webkit-keyframes fadeInDown {
+            0% {
+                opacity: 0;
+                -webkit-transform: translate3d(0, -100%, 0);
+                transform: translate3d(0, -100%, 0);
+            }
+
+            100% {
+                opacity: 1;
+                -webkit-transform: none;
+                transform: none;
+            }
+        }
+
+        @keyframes fadeInDown {
+            0% {
+                opacity: 0;
+                -webkit-transform: translate3d(0, -100%, 0);
+                transform: translate3d(0, -100%, 0);
+            }
+
+            100% {
+                opacity: 1;
+                -webkit-transform: none;
+                transform: none;
+            }
+        }
+
+        /* Simple CSS3 Fade-in Animation */
+        @-webkit-keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @-moz-keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .fadeIn {
+            opacity: 0;
+            -webkit-animation: fadeIn ease-in 1;
+            -moz-animation: fadeIn ease-in 1;
+            animation: fadeIn ease-in 1;
+
+            -webkit-animation-fill-mode: forwards;
+            -moz-animation-fill-mode: forwards;
+            animation-fill-mode: forwards;
+
+            -webkit-animation-duration: 1s;
+            -moz-animation-duration: 1s;
+            animation-duration: 1s;
+        }
+
+        .fadeIn.first {
+            -webkit-animation-delay: 0.4s;
+            -moz-animation-delay: 0.4s;
+            animation-delay: 0.4s;
+        }
+
+        .fadeIn.second {
+            -webkit-animation-delay: 0.6s;
+            -moz-animation-delay: 0.6s;
+            animation-delay: 0.6s;
+        }
+
+        .fadeIn.third {
+            -webkit-animation-delay: 0.8s;
+            -moz-animation-delay: 0.8s;
+            animation-delay: 0.8s;
+        }
+
+        .fadeIn.fourth {
+            -webkit-animation-delay: 1s;
+            -moz-animation-delay: 1s;
+            animation-delay: 1s;
+        }
+
+        .link {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    {{#unless login}}
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav class="active" id="sidebar">
+            <div style="cursor: pointer;" id="dismiss">
+                <i class="bi bi-arrow-90deg-left"></i>
+            </div>
+            <div class="sidebar-header">
+                <h3>Market Pricing System</h3>
+                <strong>MPS</strong>
+            </div>
+
+            <ul class="list-unstyled components">
+
+                <li {{#if home}}class="active" {{/if}}>
+                    <a class="link" onclick='requestLink(`/api/products`)' data-toggle="collapse" aria-expanded="false">
+                        <i class="bi bi-house-door-fill"></i>
+                        Home
+                    </a>
+                    <!--<ul class="collapse list-unstyled" id="homeSubmenu">
+                            <li>
+                                <a href="#">Home 1</a>
+                            </li>
+                            <li>
+                                <a href="#">Home 2</a>
+                            </li>
+                            <li>
+                                <a href="#">Home 3</a>
+                            </li>
+                        </ul>-->
+                </li>
+                <li {{#if supermarkets}}class="active" {{/if}}>
+                    <a class="link" onclick='requestLink(`/api/markets`)' data-toggle="collapse" aria-expanded="false">
+                        <i class="bi bi-shop-window"></i>
+                        <span class="big">Supermarkets</span>
+                        <span class="small">SM</span>
+                    </a>
+                </li>
+                <li {{#if dashboard}}class="active" {{/if}}>
+                    <a href="#Dashboard" data-toggle="collapse" aria-expanded="false">
+                        <i class="bi bi-speedometer"></i>
+                        <span class="big">Dashboard</span>
+                        <span class="small">Dash</span>
+                    </a>
+                </li>
+                <li {{#if users}}class="active" {{/if}}>
+                    <a class="link" onclick='requestLink(`/api/signup`)' data-toggle="collapse" aria-expanded="false">
+                        <i class="bi bi-people-fill"></i>
+                        Users
+                    </a>
+                </li>
+                <li {{#if about}}class="active" {{/if}}>
+                    <a href="#" data-toggle="collapse" aria-expanded="false">
+                        <i class="bi bi-briefcase-fill"></i>
+                        About
+                    </a>
+                </li>
+                <li {{#if pages}}class="active" {{/if}}>
+                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false">
+                        <i class="bi bi-file-earmark-text-fill"></i>
+                        Pages
+                    </a>
+                </li>
+
+
+                <!--<ul class="collapse list-unstyled" id="pageSubmenu">
+                            <li>
+                                <a href="#">Page 1</a>
+                            </li>
+                            <li>
+                                <a href="#">Page 2</a>
+                            </li>
+                            <li>
+                                <a href="#">Page 3</a>
+                            </li>
+                        </ul>-->
+            </ul>
+
+        </nav>
+
+
+        <!-- Page Content -->
+        <div id="content">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container-fluid">
+
+                    <div id="leftMenu">
+                        <button type="button" id="sidebarCollapse" type="button" class="btn btn-secondary">
+                            <span id="sidebarCollapse">&#9776;</span>
+                        </button>
+                        <a class="navbar-brand link" onclick='requestLink(`/api/products`)'>mps</a>
+                    </div>
+
+                    <!--<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>-->
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <!--<a class="nav-link active" aria-current="page" href="/api/products">Home</a>-->
+                            </li>
+                            <!--<li class="nav-item">
+                        <a class="nav-link" href="#">Link</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Dropdown
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="#">Action</a></li>
+                            <li><a class="dropdown-item" href="#">Another action</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled">Disabled</a>
+                    </li>-->
+                        </ul>
+                        {{#if supermarkets}}
+                        <form id="formSearch" class="d-flex" action="/api/markets" novalidate>
+                            <input value="" type="text" class="form-control me-2" placeholder="Search Supermarket..."
+                                name="search">
+                            <button class="btn btn-outline-secondary" type="submit">Search</button>
+                        </form>
+                        {{else}}
+                        <form id="formSearch" class="d-flex needs-validation" action="/api/products" novalidate>
+                            <input type="text" class="form-control me-2" placeholder="Search Product..."
+                                name="search">
+                            <button class="btn btn-outline-secondary" type="submit">Search</button>
+                        </form>
+                        {{/if}}
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+    {{/unless}}
+
+    <div class="container pt-5 pb-5">
+        {{{body}}}
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+
+
+    <script>
+        $(document).ready(function () {
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').toggleClass('active');
+                $('#leftMenu').toggleClass('leftMenu');
+            });
+
+            $('#dismiss').on('click', function () {
+                $('#sidebar').toggleClass('active');
+                $('#leftMenu').toggleClass('leftMenu');
+            });
+
+            const formSearch = document.querySelector('#formSearch');
+            formSearch.addEventListener('submit', (event) => {
+                event.preventDefault();
+                //alert("df");
+                let url = document.getElementById('formSearch').action;
+
+                // prepare form data
+                let data = new FormData(formSearch);
+
+                // configure a request
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', url, true);
+
+                let obj = {
+                    search: data.get('search')
+                }
+
+                // set headers
+                xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                xhr.setRequestHeader("Content-Type", "application/json");
+
+                // send request
+                xhr.send(JSON.stringify(obj));
+
+                // listen for `load` event
+                xhr.onload = function () {
+                    if (this.status === 200) {
+                        document.open();
+                        document.write(this.responseText);
+                        //window.history.replaceState(null, "", "/api/products");
+                        document.close();
+                    } else {
+                        obj = JSON.parse(this.responseText);
+                        document.getElementById('alert').innerHTML = `
+                <div style="text-align: center;" class="alert alert-warning alert-dismissible fade show" role="alert">
+                ${obj.fail}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+                    }
+
+                }
+            });
+
+        });
+
+        function requestLink(str) {
+            //const token = localStorage.getItem("token");
+                const URL = str;
+                // Instantiate an new XHR Object
+                const xhr = new XMLHttpRequest();
+                // Open an object (GET/POST, PATH,
+                // ASYN-TRUE/FALSE)
+                xhr.open("GET", `${URL}`, true);
+                xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                xhr.send();
+                // When response is ready
+                xhr.onload = function () {
+                        document.open();
+                        document.write(this.responseText);
+                        window.history.replaceState(null, "", `${URL}`);
+                        document.close();  
+                    }
+                    
+                }
+    </script>
+</body>
+
+</html>

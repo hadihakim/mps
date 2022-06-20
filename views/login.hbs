@@ -1,0 +1,97 @@
+<div style="height: 70vh;" class="d-flex align-items-center flex-column">
+    <h1 style="margin-bottom:5vh;">Login</h1>
+    <div class="loginWrapper fadeInDown">
+        <div style="height: 20%;" class="col-12 align-items-center d-flex flex-column" id="alert">
+            {{#if fail}}
+            <div style="text-align: center; border-radius: 10px 10px 10px 10px;"
+                class="col-12 alert alert-warning alert-dismissible fade show" role="alert">
+                {{fail}}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {{/if}}
+        </div>
+        <form style="height: 57%;" id="form" class="d-flex align-items-center flex-column col-12" action="/api/login"
+            novalidate>
+            <div class="col-9">
+                <div class="mb-3 d-flex align-items-center justify-content-center">
+                    <i style="font-size: x-large; margin-right: 1vw;" class="bi bi-envelope"></i>
+                    <div class="form-floating col-8">
+                        <input value="" type="text" class="form-control" id="floatingInput" placeholder="Email"
+                            name="Email">
+                        <label for="floatingInput">Email</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-9 mb-2">
+                <div class="mb-3 d-flex align-items-center justify-content-center">
+                    <i style="font-size: x-large; margin-right: 1vw;" class="bi bi-lock"></i>
+                    <div class="form-floating col-8">
+                        <input value="" type="password" class="form-control" id="floatingInput" placeholder="Password"
+                            name="Password">
+                        <label for="floatingInput">Password</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 d-flex justify-content-center">
+                <button class="btn btn-primary" type="submit" style="width:10vw;">Login</button>
+            </div>
+        </form>
+        <div style="height: 23%;" id="formFooter">
+            <a class="underlineHover" href="#">Forgot Password?</a>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        const form = document.querySelector('#form');
+        form.addEventListener('submit', (event) => {
+
+            // disable default action
+            event.preventDefault();
+            let url = document.getElementById('form').action;
+
+            // prepare form data
+            let data = new FormData(form);
+
+            let obj = {
+                Email: data.get('Email'),
+                Password: data.get('Password')
+            }
+
+            // configure a request
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', url, true);
+
+            // set headers
+            xhr.setRequestHeader("Content-Type", "application/json");
+            //xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+            document.getElementById('alert').innerHTML = `
+                <div style="text-align: center; margin-top: 1vh;" class="loader">
+                </div>`;
+
+            // send request
+            xhr.send(JSON.stringify(obj));
+
+            // listen for `load` event
+            xhr.onload = function () {
+                if (this.status === 200) {
+                    document.open();
+                    document.write(this.responseText);
+                    window.history.replaceState(null, "", "/api/products");
+                    document.close();
+                    
+                } else {
+                    obj = JSON.parse(this.responseText);
+                    document.getElementById('alert').innerHTML = `
+                <div style="text-align: center; border-radius: 10px 10px 10px 10px;" class="col-12 alert alert-warning alert-dismissible fade show" role="alert">
+                ${obj.fail}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+                }
+            }
+        });
+    });
+</script>

@@ -1,0 +1,58 @@
+    <button type="button" id="fetchBtn"
+            class="btn btn-primary">
+        Fetch Data
+    </button>
+  
+    <div class="container">
+        <h1>Employee List</h1>
+        <ul id="list"></ul>
+    </div>
+  
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js,
+         then Bootstrap JS -->
+
+
+    <!--New scope-->
+    <script>
+        let fetchBtn = document.getElementById("fetchBtn");
+  
+        fetchBtn.addEventListener("click", buttonclickhandler);
+  
+        function buttonclickhandler() {
+  
+            // Instantiate an new XHR Object
+            const xhr = new XMLHttpRequest();
+  
+            // Open an object (GET/POST, PATH,
+            // ASYN-TRUE/FALSE)
+            xhr.open("GET", 
+"/api/products/getProductName", true);
+  
+  
+  
+  
+            // When response is ready
+            xhr.onload = function () {
+                if (this.status === 200) {
+  
+                    // Changing string data into JSON Object
+                    obj = JSON.parse(this.responseText);
+                    console.log(obj)
+  
+                    // Getting the ul element
+                    let list = document.getElementById("list");
+                    str = ""
+                    for (key in obj) {
+                        str += 
+                        `<li>${obj[key].productName}</li>`;
+                    }
+                    list.innerHTML = str;
+                }
+                else {
+                    console.log("File not found");
+                }
+            }
+            xhr.send();
+        }
+    </script> 

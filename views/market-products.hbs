@@ -1,0 +1,284 @@
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Delete Price.</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete the price ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="submitDelete" type="submit" onclick="" class="btn btn-primary">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="priceModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add New Price</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input id="priceInput" value="" type="number" class="form-control" placeholder="Product Price"
+                    name="productPrice">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="submitAdd" type="submit" onclick="" class="btn btn-primary">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{#unless rows.[0]}}
+<div class="col-3 d-flex justify-content-start">
+        <nav aria-label="breadc rumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/api/markets">Markets</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Products</li>
+            </ol>
+        </nav>
+    </div>
+{{/unless}}
+
+{{#with rows.[0]}}
+<div class="row" style="margin-bottom: 2vh;">
+    <div class="col-3 d-flex justify-content-start">
+        <nav aria-label="breadc rumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/api/markets">Markets</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Products</li>
+            </ol>
+        </nav>
+    </div>
+    <div style="background-color:white;" class="col-9 d-flex justify-content-start">
+
+        <button disabled style="border-radius: 15px; opacity:0.8; width:12vw;" type="button"
+            class="btn btn-dark btn-sm">
+            {{this.SupermarketName}}
+        </button>
+        <button disabled style="margin-left: 1vw; border-radius: 15px; opacity:0.7; width:12vw;" type="button"
+            class="btn btn-primary btn-sm">{{this.CountryName}}</button>
+        <button disabled style="margin-left: 1vw; border-radius: 15px; opacity:0.8; width:12vw;" type="button"
+            class="btn btn-secondary btn-sm">{{this.CityName}}</button>
+        <button disabled style="margin-left: 1vw; border-radius: 15px; opacity:0.7; width:12vw;" type="button"
+            class="btn btn-light btn-sm">{{this.RegionName}}</button>
+
+    </div>
+</div>
+{{/with}}
+
+
+{{#with rows.[0]}}
+<div>
+    <div style="font-weight:bold;" class="alert alert-light" role="alert">
+        <i>Showing all products in supermarket "{{this.SupermarketName}}"</i> <i style="background-color: #ddd;"></br>
+            Address: {{this.CountryName}}, {{this.CityName}}, {{this.RegionName}}, {{this.Street}},
+            {{this.AddressDescription}}</i>.
+        
+    </div>
+</div>
+{{/with}}
+
+<div style="position: sticky; top: 0; z-index: 1;" id="alert">
+
+</div>
+
+{{#with rows.[0]}}
+<div style="margin-bottom: 2vh;" class="row">
+    <div class="col-12 d-flex justify-content-end">
+        <a href="/api/markets/addProduct/{{this.SupermarketAddressId}}" type="button"
+            class="btn btn-primary align-self-center">+ Add Product</a>
+    </div>
+</div>
+{{/with}}
+
+{{#with SpId}}
+<div style="margin-bottom: 2vh;" class="row">
+    <div class="col-12 d-flex justify-content-end">
+        <a href="/api/markets/addProduct/{{this}}" type="button"
+            class="btn btn-primary align-self-center">+ Add Product</a>
+    </div>
+</div>
+{{/with}}
+
+
+<table class="datatable table table-bordered">
+    <thead class="table-light">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Product</th>
+            <th scope="col">Category</th>
+            <th scope="col">Brand</th>
+            <th scope="col">Weight (g)</th>
+            <th scope="col">Price (L.L)</th>
+            <th scope="col">Date (EET)</th>
+            <th style="width: 23vw;" scope="col" class="text-center">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {{#each rows}}
+        <tr id="{{this.SpId}}">
+            <td style="font-weight: bold;"></td>
+            <td>{{this.productName}}</td>
+            <td>{{this.CategoryName}}</td>
+            <td>{{this.Brand}}</td>
+            <td>{{this.Weight}}</td>
+            <td>{{this.price}}</td>
+            <td>{{this.SpLastUpdate}}</td>
+            <!--<td>{{this.Weight}}</td>
+            <td style="width: 10vw;">{{this.Description}}</td>-->
+            <td class="text-center">
+                <a href="/api/markets/data?pid={{this.ProductId}}&sid={{this.SupermarketAddressId}}" type="button" class="btn btn-light btn-small"><i
+                        class="bi bi-eye" style="padding-right: 2px;"></i>History</a>
+                <a id="delete"
+                    onclick="getDeleteReady({{this.SpId}}, {{this.SupermarketAddressId}}, {{this.ProductId}})"
+                    type="button" class="btn btn-light btn-small" data-bs-toggle="modal"
+                    data-bs-target="#exampleModal"><i class="bi bi-person-x" style="padding-right: 2px;"></i>Delete</a>
+            </td>
+        </tr>
+        {{/each}}
+    </tbody>
+
+</table>
+
+<script>
+    $(document).ready(function () {
+        var t = $('.datatable').DataTable({
+            "columns": [
+                { "data": "number", orderable: false },
+                { "data": "Product"},
+                { "data": "Category"},
+                { "data": "Brand" },
+                { "data": "Weight" },
+                { "data": "Price" },
+                { "data": "Updated" },
+                { "data": "Actions", orderable: false }
+            ],
+            aoColumnDefs: [
+                {
+                    bSortable: true,
+                    aTargets: [-1]
+                }
+            ], "order": [[2, 'desc']]
+        });
+        t.on('order.dt search.dt', function () {
+            t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                cell.innerHTML = i + 1;
+            });
+        }).draw();
+    });
+
+    function fcnSubmitDelete(id, marketId, productId) {
+        $('#exampleModal').modal('hide');
+        // Instantiate an new XHR Object
+        const xhr = new XMLHttpRequest();
+        // Open an object (GET/POST, PATH,
+        // ASYN-TRUE/FALSE)
+        xhr.open("DELETE", "/api/products/prices/delete/" + id + "/" + marketId + "/" + productId, true);
+
+        // When response is ready
+        xhr.onload = function () {
+            if (this.status === 200) {
+                obj = JSON.parse(this.responseText);
+                var table = $('.datatable').DataTable();
+                table.row($('#' + id)).remove().draw();
+                // Changing string data into JSON Object
+                document.getElementById('alert').innerHTML = `
+        <div style="text-align: center;" class="alert alert-success alert-dismissible fade show" role="alert">
+          ${obj.alert}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`;
+
+            }
+            else {
+                obj = JSON.parse(this.responseText);
+                //alert(obj.alert)
+                document.getElementById('alert').innerHTML = `
+        <div style="text-align: center;" class="alert alert-warning alert-dismissible fade show" role="alert">
+          ${obj.fail}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`
+            }
+        }
+        xhr.send();
+    }
+    /*function fcnSubmitAdd(id, marketId, productId) {
+        $('#priceModal').modal('hide');
+
+        let price = document.getElementById('priceInput').value;
+        document.getElementById('priceInput').value = "";
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', "/api/products/prices/add/", true);
+
+        let obj = {
+            ProductId: productId,
+            SupermarketAddressId: marketId,
+            price: price
+        }
+        // set headers
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        // send request
+        xhr.send(JSON.stringify(obj));
+
+        // listen for `load` event
+        xhr.onload = function () {
+            if (this.status === 200) {
+                obj = JSON.parse(this.responseText);
+                var table = $('.datatable').DataTable();
+                table.row($('#' + id)).remove().draw();
+                if (obj.rows) {
+                    table.row.add({
+                        "number": 3,
+                        "Price": obj.rows[0].price,
+                        "Updated": obj.rows[0].SpLastUpdate,
+                        "Actions": `
+                <a id="delete"
+                    onclick="getDeleteReady(${obj.rows[0].SpId}, ${obj.rows[0].SupermarketAddressId}, ${obj.rows[0].ProductId})"
+                    type="button" class="btn btn-light btn-small" data-bs-toggle="modal"
+                    data-bs-target="#exampleModal"><i class="bi bi-person-x" style="padding-right: 2px;"></i>Delete</a>`
+                    }).node().id = obj.rows[0].SpId;
+                    table.draw();
+                    $('#' + obj.rows[0].SpId).children('td:nth-child(4)').addClass('text-center');
+                    $('#' + obj.rows[0].SpId).children('td:nth-child(1)').css("font-weight", "bold");
+                }
+                // Changing string data into JSON Object
+                document.getElementById('alert').innerHTML = `
+        <div style="text-align: center;" class="alert alert-success alert-dismissible fade show" role="alert">
+          ${obj.alert}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`;
+
+            } else {
+                obj = JSON.parse(this.responseText);
+                document.getElementById('alert').innerHTML = `
+                <div style="text-align: center;" class="alert alert-warning alert-dismissible fade show" role="alert">
+                ${obj.fail}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+            }
+        }
+    }*/
+
+    //onclick of a tag
+    function getDeleteReady(id, marketId, productId) {
+        $('#exampleModal').modal('show');
+        document.getElementById('submitDelete').setAttribute('onclick', 'fcnSubmitDelete(' + id + ',' + marketId + ',' + productId + ')');
+    }
+
+    /*function getAddReady(id, marketId, productId) {
+        $('#priceModal').modal('show');
+        document.getElementById('submitAdd').setAttribute('onclick', 'fcnSubmitAdd(' + id + ',' + marketId + ',' + productId + ')');
+    }*/
+
+</script>

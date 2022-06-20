@@ -1,0 +1,174 @@
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Delete product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete the product ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="submitDelete" type="submit" class="btn btn-primary">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div style="position: sticky; top: 0; z-index: 1;" id="alert">
+</div>
+
+<div style="margin-bottom: 2vh;" class="row">
+    <div class="col-6">
+        <h3>All Supermarkets.</h3>
+    </div>
+    <div class="col-6 d-flex justify-content-end">
+        <a href="/api/markets/add" type="button" class="btn btn-primary align-self-center">+ Add Supermarket</a>
+        <a style="margin-left: 1vw;" href="/api/markets/addBranch" type="button"
+            class="btn btn-secondary align-self-center">+ Add New Branch</a>
+    </div>
+</div>
+<table class="datatable table table-bordered">
+    <thead class="table-light">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Address</th>
+            <th scope="col">Description</th>
+            <th style="width: 21vw;" scope="col" class="text-center">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {{#each rows}}
+        <tr id="{{this.Id}}">
+            <th scope="row"></th>
+            <td>{{this.SupermarketName}}</td>
+            <td>{{this.CountryName}}, {{this.CityName}} </br>
+                {{this.RegionName}}, {{this.Street}} </br>
+                {{this.AddressDescription}}</td>
+                <td>{{this.Description}}</td>
+            <td class="text-center">
+                <a href="/api/markets/prices/{{this.Id}}" type="button" class="btn btn-light btn-small"><i
+                        class="bi bi-eye" style="padding-right: 2px;"></i>Products</a>
+                <a href="/api/products/update/{{this.Id}}" type="button" class="btn btn-light btn-small"><i
+                        class="bi bi-pencil" style="padding-right: 2px;"></i>Edit</a>
+                <a id="delete" onclick="getDeleteReady({{this.Id}})" type="button"
+                    class="btn btn-light btn-small"><i class="bi bi-person-x" style="padding-right: 2px;"></i>Delete</a>
+                <!---->
+            </td>
+        </tr>
+        {{/each}}
+    </tbody>
+
+    <!--{{#each rows}}
+        <div class="design">{{this.Weight}}</div>
+        {{/each}}-->
+</table>
+
+<script>
+    $(document).ready(function () {
+        var t = $('.datatable').DataTable({
+
+            "columns": [
+                { "data": "number", orderable: false },
+                { "data": "Name", orderable: true },
+                { "data": "Address", orderable: false },
+                { "data": "Description", orderable: false },
+                { "data": "Actions", orderable: false }
+            ],
+
+            aoColumnDefs: [
+                {
+                    bSortable: false,
+                    aTargets: [-1]
+                }
+            ], "order": [[1, 'asc']]
+        });
+        t.on('order.dt search.dt', function () {
+            t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                cell.innerHTML = i + 1;
+            });
+        }).draw();
+    });
+
+
+    /*function getProductPrices(id) {
+        // Instantiate an new XHR Object
+        const xhr = new XMLHttpRequest();
+        // Open an object (GET/POST, PATH,
+        // ASYN-TRUE/FALSE)
+        xhr.open("GET", "/api/markets/prices/" + id, true);
+
+        // When response is ready
+        xhr.onload = function () {
+            if (this.status === 200) {
+                //location.replace("/api/products/prices/" + id)
+                //obj = JSON.parse(this.responseText);
+                document.open();
+                document.write(this.responseText);
+                window.history.replaceState(null, "", "/api/products/prices/" + id);
+                document.close();
+            } else {
+                // Changing string data into JSON Object
+                obj = JSON.parse(this.responseText);
+                document.getElementById('alert').innerHTML = `
+        <div style="text-align: center;" class="alert alert-warning alert-dismissible fade show" role="alert">
+          ${obj.fail}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`;
+            }
+        }
+        xhr.send();
+    }*/
+
+
+    function fcnSubmitDelete(id) {
+        $('#exampleModal').modal('hide');
+        // Instantiate an new XHR Object
+        const xhr = new XMLHttpRequest();
+        // Open an object (GET/POST, PATH,
+        // ASYN-TRUE/FALSE)
+        xhr.open("DELETE", "/api/products/delete/" + id, true);
+
+        // When response is ready
+        xhr.onload = function () {
+            if (this.status === 200) {
+                /*$(document).ready(function () {
+            $('.datatable').DataTable({
+              
+          });*/
+                var table = $('.datatable').DataTable();
+                table.row($('#' + id)).remove().draw();
+                // Changing string data into JSON Object
+                obj = JSON.parse(this.responseText);
+                document.getElementById('alert').innerHTML = `
+        <div style="text-align: center;" class="alert alert-success alert-dismissible fade show" role="alert">
+          ${obj.alert}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`;
+
+            }
+            else {
+                obj = JSON.parse(this.responseText);
+                //alert(obj.alert)
+                document.getElementById('alert').innerHTML = `
+        <div style="text-align: center;" class="alert alert-warning alert-dismissible fade show" role="alert">
+          ${obj.fail}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`
+            }
+        }
+        xhr.send();
+    }
+
+    //onclick of a tag
+    function getDeleteReady(id) {
+        $('#exampleModal').modal('show');
+        document.getElementById('submitDelete').setAttribute('onclick', 'fcnSubmitDelete(' + id + ')');
+    }
+
+</script>

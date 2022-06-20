@@ -1,0 +1,78 @@
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/api/products">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">New Product</li>
+    </ol>
+</nav>
+
+<div id="alert">
+
+</div>
+
+<form id="form" class="row g-3 needs-validation" action="/api/products/add" novalidate>
+<div class="col-12">
+        <select class="form-select" aria-label="Default select example" name="productCategory">
+            <option value="" disabled selected>Select Product Category</option>
+            {{#each rows}}
+            <option value="{{this.CategoryId}}">{{this.CategoryName}}</option>
+            {{/each}}
+        </select>
+    </div>
+{{> product-form}}
+</form>
+
+<script>
+    const form = document.querySelector('#form');
+    form.addEventListener('submit', (event) => {
+
+        // disable default action
+        event.preventDefault();
+        let url = document.getElementById('form').action;
+
+        // prepare form data
+        let data = new FormData(form);
+
+        // configure a request
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', url, true);
+
+        //alert("sd")
+        let obj = {
+            productCategory: data.get('productCategory'),
+            productName: data.get('productName'),
+            productTitle: data.get('productTitle'),
+            productBrand: data.get('productBrand'),
+            productWeight: data.get('productWeight'),
+            productDescription: data.get('productDescription')
+        }
+
+        // set headers
+        xhr.setRequestHeader("Content-Type", "application/json");
+        //xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+        // send request
+        xhr.send(JSON.stringify(obj));
+
+        // listen for `load` event
+        xhr.onload = function () {
+            if (this.status === 200) {
+                //obj = JSON.parse(this.responseText);
+                obj = JSON.parse(this.responseText);
+                document.getElementById('alert').innerHTML = `
+                <div style="text-align: center;" class="alert alert-success alert-dismissible fade show" role="alert">
+                ${obj.alert}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+            } else {
+                obj = JSON.parse(this.responseText);
+                document.getElementById('alert').innerHTML = `
+                <div style="text-align: center;" class="alert alert-warning alert-dismissible fade show" role="alert">
+                ${obj.fail}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+            }
+
+        }
+
+    });
+</script>

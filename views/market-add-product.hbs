@@ -1,0 +1,90 @@
+{{#with Id}}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/api/markets">Markets</a></li>
+        <li class="breadcrumb-item"><a href="/api/markets/prices/{{this}}">Products</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Add Product</li>
+    </ol>
+</nav>
+{{/with}}
+
+<div id="alert">
+
+</div>
+
+{{#with Id}}
+<form id="form" class="row g-3 needs-validation" action="/api/markets/addProduct/{{this}}" novalidate>
+{{/with}}
+    <div class="col-12">
+        <select class="form-select" aria-label="Default select example" name="productId">
+            <option value="" disabled selected>Select Product</option>
+            {{#each rows}}
+            <option value="{{this.ProductId}}">{{this.productName}}, {{this.Brand}}, {{this.Description}}</option>
+            {{/each}}
+        </select>
+    </div>
+
+    <div class="col-6">
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="floatingInput" placeholder="Price" name="Price">
+            <label for="floatingInput">Price</label>
+        </div>
+    </div>
+
+    <div class="col-12 d-flex justify-content-end">
+        <button class="btn btn-primary" type="submit" style="width:12vw;">Submit</button>
+    </div>
+</form>
+
+
+<script>
+    const form = document.querySelector('#form');
+    form.addEventListener('submit', (event) => {
+
+        // disable default action
+        event.preventDefault();
+        let url = document.getElementById('form').action;
+
+        // prepare form data
+        let data = new FormData(form);
+
+        // configure a request
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', url, true);
+
+        //alert("sd")
+        let obj = {
+            productId: data.get('productId'),
+            Price: data.get('Price')
+        }
+
+        // set headers
+        xhr.setRequestHeader("Content-Type", "application/json");
+        //xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+        // send request
+        xhr.send(JSON.stringify(obj));
+
+        // listen for `load` event
+        xhr.onload = function () {
+            if (this.status === 200) {
+                //obj = JSON.parse(this.responseText);
+                obj = JSON.parse(this.responseText);
+                document.getElementById('alert').innerHTML = `
+                <div style="text-align: center;" class="alert alert-success alert-dismissible fade show" role="alert">
+                ${obj.alert}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+            } else {
+                obj = JSON.parse(this.responseText);
+                document.getElementById('alert').innerHTML = `
+                <div style="text-align: center;" class="alert alert-warning alert-dismissible fade show" role="alert">
+                ${obj.fail}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+            }
+
+        }
+
+    });
+</script>

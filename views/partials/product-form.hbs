@@ -1,0 +1,44 @@
+ 
+
+    <div class="col-6">
+        <div class="form-floating mb-3">
+            
+            <input value="{{this.productName}}" type="text" class="form-control" id="floatingInput" placeholder="Product Name" name="productName">
+            
+            <label for="floatingInput">Product Name</label>
+        </div>
+    </div>
+
+    <div class="col-6">
+        <div class="form-floating mb-3">
+            <input value="{{this.Title}}" type="text" class="form-control" id="floatingInput" placeholder="Product Title" name="productTitle">
+            <label for="floatingInput">Product Title</label>
+        </div>
+    </div>
+
+    <div class="col-6">
+        <div class="form-floating mb-3">
+            <input value="{{this.Brand}}" type="text" class="form-control" id="floatingInput" placeholder="Product Brand" name="productBrand">
+            <label for="floatingInput">Product Brand</label>
+        </div>
+    </div>
+
+    <div class="col-6">
+        <div class="form-floating mb-3">
+            <input value="{{this.Weight}}" type="number" class="form-control" id="floatingInput" placeholder="Product Weight"
+                name="productWeight">
+            <label for="floatingInput">Product Weight</label>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="form-floating mb-3">
+            <textarea class="form-control" name="productDescription" id="floatingInput" cols="55" rows="55"
+                placeholder="Description">{{this.Description}}</textarea>
+            <label for="floatingInput">Description</label>
+        </div>
+    </div>
+
+    <div class="col-12 d-flex justify-content-end">
+        <button class="btn btn-primary" type="submit" style="width:12vw;">Submit</button>
+    </div>
