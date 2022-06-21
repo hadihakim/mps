@@ -612,8 +612,7 @@
                         </form>
                         {{else}}
                         <form id="formSearch" class="d-flex needs-validation" action="/api/products" novalidate>
-                            <input type="text" class="form-control me-2" placeholder="Search Product..."
-                                name="search">
+                            <input type="text" class="form-control me-2" placeholder="Search Product..." name="search">
                             <button class="btn btn-outline-secondary" type="submit">Search</button>
                         </form>
                         {{/if}}
@@ -691,25 +690,57 @@
 
         });
 
+        function makeGetRequest(url) {
+            //alert(localStorage.getItem('token'))
+            // Instantiate an new XHR Object
+            const xhr = new XMLHttpRequest();
+            // Open an object (GET/POST, PATH,
+            // ASYN-TRUE/FALSE)
+            xhr.open("GET", `${url}`, true);
+            xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+
+            // When response is ready
+            xhr.onload = function () {
+                if (this.status != 200 && this.status != 401) {
+                    // Changing string data into JSON Object
+                    obj = JSON.parse(this.responseText);
+                    document.getElementById('alert').innerHTML = `
+        <div style="text-align: center;" class="alert alert-warning alert-dismissible fade show" role="alert">
+          ${obj.fail}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`;
+                } else {
+                    //location.replace("/api/products/prices/" + id)
+                    //obj = JSON.parse(this.responseText);
+                    document.open();
+                    document.write(this.responseText);
+                    window.history.replaceState(null, "", `${url}`);
+                    document.close();
+                    //localStorage.clear();
+                }
+            }
+            xhr.send();
+        }
+
         function requestLink(str) {
             //const token = localStorage.getItem("token");
-                const URL = str;
-                // Instantiate an new XHR Object
-                const xhr = new XMLHttpRequest();
-                // Open an object (GET/POST, PATH,
-                // ASYN-TRUE/FALSE)
-                xhr.open("GET", `${URL}`, true);
-                xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
-                xhr.send();
-                // When response is ready
-                xhr.onload = function () {
-                        document.open();
-                        document.write(this.responseText);
-                        window.history.replaceState(null, "", `${URL}`);
-                        document.close();  
-                    }
-                    
-                }
+            const URL = str;
+            // Instantiate an new XHR Object
+            const xhr = new XMLHttpRequest();
+            // Open an object (GET/POST, PATH,
+            // ASYN-TRUE/FALSE)
+            xhr.open("GET", `${URL}`, true);
+            xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+            xhr.send();
+            // When response is ready
+            xhr.onload = function () {
+                document.open();
+                document.write(this.responseText);
+                window.history.replaceState(null, "", `${URL}`);
+                document.close();
+            }
+
+        }
     </script>
 </body>
 

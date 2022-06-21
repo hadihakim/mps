@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { check } = require('express-validator');
 const productMarketController = require('../controllers/productMarketController');
+const checkAuth = require('../middleware/check-auth');
 
-
+router.use(checkAuth);
 router.get('/data?:pid?:sid', productMarketController.getPrices);
 /*router.get('/add', productController.getAddForm);
 router.get('/update/:id', productController.getUpdate);

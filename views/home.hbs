@@ -26,7 +26,8 @@
     <h3>All Products</h3>
   </div>
   <div class="col-6 d-flex justify-content-end">
-    <a onclick="makeGetRequest(`/api/products/add`)" type="button" class="btn btn-primary align-self-center">+ Add Product</a>
+    <a onclick="makeGetRequest(`/api/products/add`)" type="button" class="btn btn-primary align-self-center">+ Add
+      Product</a>
   </div>
 </div>
 <table class="datatable table table-bordered">
@@ -54,10 +55,10 @@
       <td>{{this.Weight}}</td>
       <td style="width: 10vw;">{{this.Description}}</td>
       <td class="text-center">
-        <a onclick="makeGetRequest(`/api/products/prices/{{this.ProductId}}`)" type="button" class="btn btn-light btn-small"><i
-            class="bi bi-eye" style="padding-right: 2px;"></i>Recent Prices</a>
-        <a href="/api/products/update/{{this.ProductId}}" type="button" class="btn btn-light btn-small"><i
-            class="bi bi-pencil" style="padding-right: 2px;"></i>Edit</a>
+        <a onclick="makeGetRequest(`/api/products/prices/{{this.ProductId}}`)" type="button"
+          class="btn btn-light btn-small"><i class="bi bi-eye" style="padding-right: 2px;"></i>Recent Prices</a>
+        <a onclick="makeGetRequest(`/api/products/update/{{this.ProductId}}`)" type="button"
+          class="btn btn-light btn-small"><i class="bi bi-pencil" style="padding-right: 2px;"></i>Edit</a>
         <a id="delete" onclick="getDeleteReady({{this.ProductId}})" type="button" class="btn btn-light btn-small"><i
             class="bi bi-person-x" style="padding-right: 2px;"></i>Delete</a>
         <!---->
@@ -108,40 +109,6 @@
     }).draw();
   });
 
-
-  function makeGetRequest(url) {
-    //alert(localStorage.getItem('token'))
-    // Instantiate an new XHR Object
-    const xhr = new XMLHttpRequest();
-    // Open an object (GET/POST, PATH,
-    // ASYN-TRUE/FALSE)
-    xhr.open("GET", `${url}`, true);
-    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
-
-    // When response is ready
-    xhr.onload = function () {
-      if (this.status === 200) {
-        //location.replace("/api/products/prices/" + id)
-        //obj = JSON.parse(this.responseText);
-        document.open();
-        document.write(this.responseText);
-        window.history.replaceState(null, "", `${url}`);
-        document.close();
-        localStorage.clear();
-      } else {
-        // Changing string data into JSON Object
-        obj = JSON.parse(this.responseText);
-        document.getElementById('alert').innerHTML = `
-        <div style="text-align: center;" class="alert alert-warning alert-dismissible fade show" role="alert">
-          ${obj.fail}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>`;
-      }
-    }
-    xhr.send();
-  }
-
-
   function fcnSubmitDelete(id) {
     $('#exampleModal').modal('hide');
     // Instantiate an new XHR Object
@@ -149,6 +116,7 @@
     // Open an object (GET/POST, PATH,
     // ASYN-TRUE/FALSE)
     xhr.open("DELETE", "/api/products/delete/" + id, true);
+    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
 
     // When response is ready
     xhr.onload = function () {
@@ -168,7 +136,7 @@
         </div>`;
 
       }
-      else {
+      else if(this.status != 401) {
         obj = JSON.parse(this.responseText);
         //alert(obj.alert)
         document.getElementById('alert').innerHTML = `
@@ -176,6 +144,11 @@
           ${obj.fail}
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>`
+      } else {
+        document.open();
+        document.write(this.responseText);
+        window.history.replaceState(null, "", "/api/login");
+        document.close();
       }
     }
     xhr.send();

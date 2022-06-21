@@ -10,7 +10,7 @@
 </div>
 
 <form id="form" class="row g-3 needs-validation" action="/api/products/add" novalidate>
-<div class="col-12">
+    <div class="col-12">
         <select class="form-select" aria-label="Default select example" name="productCategory">
             <option value="" disabled selected>Select Product Category</option>
             {{#each rows}}
@@ -18,7 +18,7 @@
             {{/each}}
         </select>
     </div>
-{{> product-form}}
+    {{> product-form}}
 </form>
 
 <script>
@@ -47,8 +47,8 @@
         }
 
         // set headers
+        xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
         xhr.setRequestHeader("Content-Type", "application/json");
-        //xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
         // send request
         xhr.send(JSON.stringify(obj));
@@ -63,13 +63,18 @@
                 ${obj.alert}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>`;
-            } else {
+            } else if (this.status != 401) {
                 obj = JSON.parse(this.responseText);
                 document.getElementById('alert').innerHTML = `
                 <div style="text-align: center;" class="alert alert-warning alert-dismissible fade show" role="alert">
                 ${obj.fail}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>`;
+            } else {
+                document.open();
+                document.write(this.responseText);
+                window.history.replaceState(null, "", "/api/login");
+                document.close();
             }
 
         }

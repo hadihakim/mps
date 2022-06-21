@@ -54,7 +54,7 @@
             </div>
             <div class="modal-body">
                 <input id="priceInput" value="" type="number" class="form-control" placeholder="Product Price"
-                name="productPrice">
+                    name="productPrice">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -92,10 +92,11 @@
             <!--<td>{{this.Weight}}</td>
             <td style="width: 10vw;">{{this.Description}}</td>-->
             <td class="text-center">
-                <a href="/api/productMarket/data?pid={{this.ProductId}}&sid={{this.SupermarketAddressId}}" type="button" class="btn btn-light btn-small"><i
-                        class="bi bi-eye" style="padding-right: 2px;"></i>History</a>
-                <a onclick="getAddReady({{this.SpId}}, {{this.SupermarketAddressId}}, {{this.ProductId}})" type="button" class="btn btn-light btn-small"><i
-                        class="bi bi-pencil" style="padding-right: 2px;"></i>Add Price</a>
+                <a onclick="makeGetRequest(`/api/productMarket/data?pid={{this.ProductId}}&sid={{this.SupermarketAddressId}}`)" type="button"
+                    class="btn btn-light btn-small"><i class="bi bi-eye" style="padding-right: 2px;"></i>History</a>
+                <a onclick="getAddReady({{this.SpId}}, {{this.SupermarketAddressId}}, {{this.ProductId}})" type="button"
+                    class="btn btn-light btn-small"><i class="bi bi-pencil" style="padding-right: 2px;"></i>Add
+                    Price</a>
                 <a id="delete"
                     onclick="getDeleteReady({{this.SpId}}, {{this.SupermarketAddressId}}, {{this.ProductId}})"
                     type="button" class="btn btn-light btn-small" data-bs-toggle="modal"
@@ -112,7 +113,7 @@
         var t = $('.datatable').DataTable({
             "columns": [
                 { "data": "number", orderable: false },
-                { "data": "Name"},
+                { "data": "Name" },
                 { "data": "Address", orderable: false },
                 { "data": "Price" },
                 { "data": "Updated" },
@@ -123,13 +124,13 @@
                     bSortable: false,
                     aTargets: [-1]
                 }
-            ], "order": [[ 3, 'asc' ]]
-        }); 
-        t.on( 'order.dt search.dt', function () {
-        t.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
-            cell.innerHTML = i+1;
-        } );
-    } ).draw();
+            ], "order": [[3, 'asc']]
+        });
+        t.on('order.dt search.dt', function () {
+            t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                cell.innerHTML = i + 1;
+            });
+        }).draw();
     });
 
 
@@ -140,22 +141,23 @@
         // Open an object (GET/POST, PATH,
         // ASYN-TRUE/FALSE)
         xhr.open("DELETE", "/api/products/prices/delete/" + id + "/" + marketId + "/" + productId, true);
+        xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
 
         // When response is ready
         xhr.onload = function () {
             if (this.status === 200) {
                 obj = JSON.parse(this.responseText);
                 var table = $('.datatable').DataTable();
-                if(obj.rows) {
-                     table.row.add({
-                    "number": 3,
-                    "Name": obj.rows[0].SupermarketName,
-                    "Address": `${obj.rows[0].CountryName}, ${obj.rows[0].CityName} </br>
+                if (obj.rows) {
+                    table.row.add({
+                        "number": 3,
+                        "Name": obj.rows[0].SupermarketName,
+                        "Address": `${obj.rows[0].CountryName}, ${obj.rows[0].CityName} </br>
                 ${obj.rows[0].RegionName}, ${obj.rows[0].Street} </br>
                 ${obj.rows[0].AddressDescription}`,
-                    "Price": obj.rows[0].price,
-                    "Updated": obj.rows[0].SpLastUpdate,
-                    "Actions": `<a href="/api/productMarket/data?pid=${obj.rows[0].ProductId}&sid=${obj.rows[0].SupermarketAddressId}" type="button" class="btn btn-light btn-small"><i
+                        "Price": obj.rows[0].price,
+                        "Updated": obj.rows[0].SpLastUpdate,
+                        "Actions": `<a onclick="`makeGetRequest(`/api/productMarket/data?pid=${obj.rows[0].ProductId}&sid=${obj.rows[0].SupermarketAddressId}`)`" type="button" class="btn btn-light btn-small"><i
                         class="bi bi-eye" style="padding-right: 2px;"></i>History</a>
                 <a onclick="getAddReady(${obj.rows[0].SpId}, ${obj.rows[0].SupermarketAddressId}, ${obj.rows[0].ProductId})" type="button" class="btn btn-light btn-small"><i
                         class="bi bi-pencil" style="padding-right: 2px;"></i>Add Price</a>
@@ -163,16 +165,16 @@
                     onclick="getDeleteReady(${obj.rows[0].SpId}, ${obj.rows[0].SupermarketAddressId}, ${obj.rows[0].ProductId})"
                     type="button" class="btn btn-light btn-small" data-bs-toggle="modal"
                     data-bs-target="#exampleModal"><i class="bi bi-person-x" style="padding-right: 2px;"></i>Delete</a>`
-                }).node().id = obj.rows[0].SpId;
-                //$('#' + obj.rows[0].SpId).children('td:nth-child(6)').addClass('text-end');
-                //$('#' + obj.rows[0].SpId).children('td:nth-child(1)').remove();
-                //let numValue = $('#' + obj.rows[0].SpId).html();
-                //$('#' + obj.rows[0].SpId).prepend(`<th scope="row"></th>`);
-                table.draw();
-                $('#' + obj.rows[0].SpId).children('td:nth-child(6)').addClass('text-center');
-                $('#' + obj.rows[0].SpId).children('td:nth-child(1)').css("font-weight", "bold");
-                
-                
+                    }).node().id = obj.rows[0].SpId;
+                    //$('#' + obj.rows[0].SpId).children('td:nth-child(6)').addClass('text-end');
+                    //$('#' + obj.rows[0].SpId).children('td:nth-child(1)').remove();
+                    //let numValue = $('#' + obj.rows[0].SpId).html();
+                    //$('#' + obj.rows[0].SpId).prepend(`<th scope="row"></th>`);
+                    table.draw();
+                    $('#' + obj.rows[0].SpId).children('td:nth-child(6)').addClass('text-center');
+                    $('#' + obj.rows[0].SpId).children('td:nth-child(1)').css("font-weight", "bold");
+
+
                 }
                 table.row($('#' + id)).remove().draw();
                 // Changing string data into JSON Object
@@ -183,7 +185,7 @@
         </div>`;
 
             }
-            else {
+            else if (this.status != 401) {
                 obj = JSON.parse(this.responseText);
                 //alert(obj.alert)
                 document.getElementById('alert').innerHTML = `
@@ -191,6 +193,11 @@
           ${obj.fail}
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>`
+            } else {
+                document.open();
+                document.write(this.responseText);
+                window.history.replaceState(null, "", "/api/login");
+                document.close();
             }
         }
         xhr.send();
@@ -210,8 +217,9 @@
             price: price
         }
         // set headers
+        xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
         xhr.setRequestHeader("Content-Type", "application/json");
-  
+
         // send request
         xhr.send(JSON.stringify(obj));
 
@@ -221,16 +229,16 @@
                 obj = JSON.parse(this.responseText);
                 var table = $('.datatable').DataTable();
                 table.row($('#' + id)).remove().draw();
-                if(obj.rows) {
-                     table.row.add({
-                    "number": 2,
-                    "Name": obj.rows[0].SupermarketName,
-                    "Address": `${obj.rows[0].CountryName}, ${obj.rows[0].CityName} </br>
+                if (obj.rows) {
+                    table.row.add({
+                        "number": 2,
+                        "Name": obj.rows[0].SupermarketName,
+                        "Address": `${obj.rows[0].CountryName}, ${obj.rows[0].CityName} </br>
                 ${obj.rows[0].RegionName}, ${obj.rows[0].Street} </br>
                 ${obj.rows[0].AddressDescription}`,
-                    "Price": obj.rows[0].price,
-                    "Updated": obj.rows[0].SpLastUpdate,
-                    "Actions": `<a href="/api/productMarket/data?pid=${obj.rows[0].ProductId}&sid=${obj.rows[0].SupermarketAddressId}" type="button" class="btn btn-light btn-small"><i
+                        "Price": obj.rows[0].price,
+                        "Updated": obj.rows[0].SpLastUpdate,
+                        "Actions": `<a href="/api/productMarket/data?pid=${obj.rows[0].ProductId}&sid=${obj.rows[0].SupermarketAddressId}" type="button" class="btn btn-light btn-small"><i
                         class="bi bi-eye" style="padding-right: 2px;"></i>History</a>
                 <a onclick="getAddReady(${obj.rows[0].SpId}, ${obj.rows[0].SupermarketAddressId}, ${obj.rows[0].ProductId})" type="button" class="btn btn-light btn-small"><i
                         class="bi bi-pencil" style="padding-right: 2px;"></i>Add Price</a>
@@ -238,13 +246,13 @@
                     onclick="getDeleteReady(${obj.rows[0].SpId}, ${obj.rows[0].SupermarketAddressId}, ${obj.rows[0].ProductId})"
                     type="button" class="btn btn-light btn-small" data-bs-toggle="modal"
                     data-bs-target="#exampleModal"><i class="bi bi-person-x" style="padding-right: 2px;"></i>Delete</a>`
-                }).node().id = obj.rows[0].SpId;
-                table.draw();
-                $('#' + obj.rows[0].SpId).children('td:nth-child(6)').addClass('text-center');
-                $('#' + obj.rows[0].SpId).children('td:nth-child(1)').css("font-weight", "bold");
-                /*$('#' + obj.rows[0].SpId).children('td:nth-child(6)').addClass('text-end');
-                $('#' + obj.rows[0].SpId).children('td:nth-child(1)').remove();
-                $('#' + obj.rows[0].SpId).prepend(`<th scope="row">${obj.rows[0].SupermarketAddressId}</th>`);*/
+                    }).node().id = obj.rows[0].SpId;
+                    table.draw();
+                    $('#' + obj.rows[0].SpId).children('td:nth-child(6)').addClass('text-center');
+                    $('#' + obj.rows[0].SpId).children('td:nth-child(1)').css("font-weight", "bold");
+                    /*$('#' + obj.rows[0].SpId).children('td:nth-child(6)').addClass('text-end');
+                    $('#' + obj.rows[0].SpId).children('td:nth-child(1)').remove();
+                    $('#' + obj.rows[0].SpId).prepend(`<th scope="row">${obj.rows[0].SupermarketAddressId}</th>`);*/
                 }
                 // Changing string data into JSON Object
                 document.getElementById('alert').innerHTML = `
@@ -253,13 +261,18 @@
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>`;
 
-            } else {
+            } else if (this.status != 401) {
                 obj = JSON.parse(this.responseText);
                 document.getElementById('alert').innerHTML = `
                 <div style="text-align: center;" class="alert alert-warning alert-dismissible fade show" role="alert">
                 ${obj.fail}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>`;
+            } else {
+                document.open();
+                document.write(this.responseText);
+                window.history.replaceState(null, "", "/api/login");
+                document.close();
             }
         }
     }
@@ -271,8 +284,8 @@
     }
 
     function getAddReady(id, marketId, productId) {
-    $('#priceModal').modal('show');
-    document.getElementById('submitAdd').setAttribute('onclick', 'fcnSubmitAdd(' + id + ',' + marketId + ',' + productId + ')');
-  }
+        $('#priceModal').modal('show');
+        document.getElementById('submitAdd').setAttribute('onclick', 'fcnSubmitAdd(' + id + ',' + marketId + ',' + productId + ')');
+    }
 
 </script>
